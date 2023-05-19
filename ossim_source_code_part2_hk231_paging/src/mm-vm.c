@@ -447,9 +447,12 @@ int find_victim_page(struct mm_struct *mm, int *retpgn)
   struct pgn_t *pg = mm->fifo_pgn;
 
   /* TODO: Implement the theorical mechanism to find the victim page */
-
   //Case 1: Queue that the victim page is in the head of the linked list
   struct pgn_t *tmp = pg;
+  *retpgn = pg->pgn;
+  //Case 2: Queue that the victim page is in the tail of the linked list
+  while(pg->pg_next != NULL)
+    pg = pg->pg_next;
   *retpgn = pg->pgn;
   free(pg);
 
