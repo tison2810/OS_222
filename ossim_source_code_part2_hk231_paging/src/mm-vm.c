@@ -175,15 +175,15 @@ int pg_getpage(struct mm_struct *mm, int pgn, int *fpn, struct pcb_t *caller)
   if (!PAGING_PAGE_PRESENT(pte))
   { /* Page is not online, make it actively living */
     int vicpgn, swpfpn; 
-    //int vicfpn;
-    //uint32_t vicpte;
+    int vicfpn;
+    uint32_t vicpte;
 
     int tgtfpn = PAGING_SWP(pte);//the target frame storing our variable
 
     /* TODO: Play with your paging theory here */
     /* Find victim page */
     find_victim_page(caller->mm, &vicpgn);
-
+    vicpte = mm->pgd[vicpgn];
     /* Get free frame in MEMSWP */
     MEMPHY_get_freefp(caller->active_mswp, &swpfpn);
 
@@ -451,9 +451,11 @@ int find_victim_page(struct mm_struct *mm, int *retpgn)
   struct pgn_t *tmp = pg;
   *retpgn = pg->pgn;
   //Case 2: Queue that the victim page is in the tail of the linked list
-  while(pg->pg_next != NULL)
-    pg = pg->pg_next;
-  *retpgn = pg->pgn;
+
+  // while(pg->pg_next != NULL)
+  //   pg = pg->pg_next;
+  // *retpgn = pg->pgn;
+
   free(pg);
 
   return 0;
