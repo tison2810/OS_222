@@ -99,6 +99,15 @@ int vmap_page_range(struct pcb_t *caller, // process call
    *      [addr to addr + pgnum*PAGING_PAGESZ
    *      in page table caller->mm->pgd[]
    */
+  for (int i = 0; i < pgnum; i++) {
+        if (caller->mm->pgd[pgn + i] != NULL) {
+            // Page is already mapped, handle error or perform replacement if needed
+        } else {
+            caller->mm->pgd[pgn + i] = fpit;
+            ret_rg->rg_end += PAGING_PAGESZ; // Update the end address of the mapped region
+            fpit = fpit->fp_next;
+        }
+    }
    /* Tracking for later page replacement activities (if needed)
     * Enqueue new usage page */
    enlist_pgn_node(&caller->mm->fifo_pgn, pgn+pgit);
