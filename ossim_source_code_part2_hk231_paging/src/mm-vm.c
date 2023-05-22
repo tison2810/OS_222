@@ -90,9 +90,13 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
 
     return 0;
   }
-
+  
   /* TODO get_free_vmrg_area FAILED handle the region management (Fig.6)*/
+  caller->mm->symrgtbl[rgid].rg_start = caller->mm->mmap->sbrk;
+  caller->mm->mmap->sbrk += size; //increase size of the region area 
+  caller->mm->symrgtbl[rgid].rg_end = caller->mm->mmap->sbrk;
 
+  *alloc_addr = caller->mm->symrgtbl[rgid].rg_start;
   /*Attempt to increate limit to get space */
   struct vm_area_struct *cur_vma = get_vma_by_num(caller->mm, vmaid);
   int inc_sz = PAGING_PAGE_ALIGNSZ(size);
@@ -111,7 +115,7 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   caller->mm->symrgtbl[rgid].rg_end = old_sbrk + size;
 
   *alloc_addr = old_sbrk;
-
+  cur_vma->sbrk += size; //need to increment or not?
   return 0;
 }
 
