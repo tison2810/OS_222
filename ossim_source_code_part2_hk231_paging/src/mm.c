@@ -7,10 +7,11 @@
 #include "mm.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <pthread.h>
 /* 
  * init_pte - Initialize PTE entry
  */
+pthread_mutex_t mem_lock = PTHREAD_MUTEX_INITIALIZER;
 int init_pte(uint32_t *pte,
              int pre,    // present
              int fpn,    // FPN
@@ -65,7 +66,7 @@ int pte_set_swap(uint32_t *pte, int swptyp, int swpoff)
  * @pte   : target page table entry (PTE)
  * @fpn   : frame page number (FPN)
  */
-int pte_set_fpn(uint32_t *pte, int fpn)
+int pte_set_fpn(uint32_t *pte, int fpn) //responsible for setting the Frame Page Number (FPN) in a Page Table Entry (PTE)
 {
   SETBIT(*pte, PAGING_PTE_PRESENT_MASK);
   CLRBIT(*pte, PAGING_PTE_SWAPPED_MASK);
@@ -89,7 +90,7 @@ int vmap_page_range(struct pcb_t *caller, // process call
   struct framephy_struct *fpit = malloc(sizeof(struct framephy_struct));
   //int  fpn;
   int pgit = 0;
-  int pgn = PAGING_PGN(addr);
+  int pgn = PAGING_PGN(addr); //Extract page number
 
   ret_rg->rg_end = ret_rg->rg_start = addr; // at least the very first space is usable
 
@@ -98,9 +99,10 @@ int vmap_page_range(struct pcb_t *caller, // process call
   /* TODO map range of frame to address space 
    *      [addr to addr + pgnum*PAGING_PAGESZ
    *      in page table caller->mm->pgd[]
-   */
-  for (int i = 0; i < pgnum; i++) {
-        if (caller->mm->pgd[pgn + i] != NULL) {
+   */ 
+  pthread_mutex_lock(&mem_lock);
+  for (; pgit < pgnum; pgit++) {
+        if (caller->mm->pgd[pgn + pgit] != NULL) {
             // Page is already mapped, handle error or perform replacement if needed
         } else {
             caller->mm->pgd[pgn + i] = fpit;
@@ -108,6 +110,7 @@ int vmap_page_range(struct pcb_t *caller, // process call
             fpit = fpit->fp_next;
         }
     }
+
    /* Tracking for later page replacement activities (if needed)
     * Enqueue new usage page */
    enlist_pgn_node(&caller->mm->fifo_pgn, pgn+pgit);
