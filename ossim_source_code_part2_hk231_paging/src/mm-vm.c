@@ -92,11 +92,7 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   }
   
   /* TODO get_free_vmrg_area FAILED handle the region management (Fig.6)*/
-  caller->mm->symrgtbl[rgid].rg_start = caller->mm->mmap->sbrk;
-  caller->mm->mmap->sbrk += size; //increase size of the region area 
-  caller->mm->symrgtbl[rgid].rg_end = caller->mm->mmap->sbrk;
 
-  *alloc_addr = caller->mm->symrgtbl[rgid].rg_start;
   /*Attempt to increate limit to get space */
   struct vm_area_struct *cur_vma = get_vma_by_num(caller->mm, vmaid);
   int inc_sz = PAGING_PAGE_ALIGNSZ(size);
@@ -105,6 +101,11 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
 
   old_sbrk = cur_vma->sbrk;
 
+  caller->mm->symrgtbl[rgid].rg_start = caller->mm->mmap->sbrk;
+  caller->mm->mmap->sbrk += size; //increase size of the region area 
+  caller->mm->symrgtbl[rgid].rg_end = caller->mm->mmap->sbrk;
+
+  *alloc_addr = caller->mm->symrgtbl[rgid].rg_start;
   /* TODO INCREASE THE LIMIT
    * inc_vma_limit(caller, vmaid, inc_sz)
    */
@@ -115,7 +116,7 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   caller->mm->symrgtbl[rgid].rg_end = old_sbrk + size;
 
   *alloc_addr = old_sbrk;
-  cur_vma->sbrk += size; //need to increment or not?
+  cur_vma->sbrk += size;
   return 0;
 }
 
@@ -134,7 +135,12 @@ int __free(struct pcb_t *caller, int vmaid, int rgid)
     return -1;
 
   /* TODO: Manage the collect freed region to freerg_list */
+  rgnode.rg_start = caller->mm->symrgtbl[rgid].rg_start;
+  rgnode.rg_end = caller->mm->symrgtbl[rgid].rg_end;
 
+  //note that this region can reuse for future allocation
+  caller->mm->symrgtbl[rgid].rg_start = 0;
+  caller->mm->symrgtbl[rgid].rg_end = 0;
   /*enlist the obsoleted memory region */
   enlist_vm_freerg_list(caller->mm, rgnode);
 
