@@ -105,7 +105,7 @@ int vmap_page_range(struct pcb_t *caller, // process call
         if (caller->mm->pgd[pgn + pgit] != NULL) {
             // Page is already mapped, handle error or perform replacement if needed
         } else {
-            caller->mm->pgd[pgn + i] = fpit;
+            caller->mm->pgd[pgn + pgit] = fpit;
             ret_rg->rg_end += PAGING_PAGESZ; // Update the end address of the mapped region
             fpit = fpit->fp_next;
         }
