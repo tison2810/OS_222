@@ -114,7 +114,7 @@ int vmap_page_range(struct pcb_t *caller, // process call
    /* Tracking for later page replacement activities (if needed)
     * Enqueue new usage page */
    enlist_pgn_node(&caller->mm->fifo_pgn, pgn+pgit);
-
+   pthread_mutex_unlock(&mem_lock);
 
   return 0;
 }
