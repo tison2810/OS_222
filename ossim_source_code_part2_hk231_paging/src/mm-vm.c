@@ -97,9 +97,9 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   struct vm_area_struct *cur_vma = get_vma_by_num(caller->mm, vmaid);
   int inc_sz = PAGING_PAGE_ALIGNSZ(size);
   //int inc_limit_ret
-  int old_sbrk ;
+  // int old_sbrk;
 
-  old_sbrk = cur_vma->sbrk;
+  // old_sbrk = cur_vma->sbrk;
 
   caller->mm->symrgtbl[rgid].rg_start = caller->mm->mmap->sbrk;
   caller->mm->mmap->sbrk += size; //increase size of the region area 
@@ -112,10 +112,10 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   inc_vma_limit(caller, vmaid, inc_sz);
 
   /*Successful increase limit */
-  caller->mm->symrgtbl[rgid].rg_start = old_sbrk;
-  caller->mm->symrgtbl[rgid].rg_end = old_sbrk + size;
+  // caller->mm->symrgtbl[rgid].rg_start = old_sbrk;
+  // caller->mm->symrgtbl[rgid].rg_end = old_sbrk + size;
 
-  *alloc_addr = old_sbrk;
+  // *alloc_addr = old_sbrk;
   cur_vma->sbrk += size;
   return 0;
 }
