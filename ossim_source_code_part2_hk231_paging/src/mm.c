@@ -130,12 +130,29 @@ int vmap_page_range(struct pcb_t *caller,           // process call
 int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struct **frm_lst)
 {
   int pgit, fpn;
-  // struct framephy_struct *newfp_str;
+  struct framephy_struct *newfp_str = NULL;
 
   for (pgit = 0; pgit < req_pgnum; pgit++)
   {
     if (MEMPHY_get_freefp(caller->mram, &fpn) == 0)
     {
+      newfp_str = malloc(sizeof(struct framephy_struct));
+      newfp_str->owner = caller->mm;
+      if(frm_lst == NULL)
+     {
+       newfp_str->fp_next = NULL;
+       newfp_str->fpn = fpn;
+       *frm_lst = newfp_str;
+     }
+      // case 2: frame list is not empty
+      else
+      {
+        newfp_str->fp_next = *frm_lst;
+        newfp_str->fpn = fpn;
+        *frm_lst = newfp_str;
+      }
+      MEMPHY_put_fp(caller->mram, fpn);
+      
     }
     else
     { // ERROR CODE of obtaining somes but not enough frames
