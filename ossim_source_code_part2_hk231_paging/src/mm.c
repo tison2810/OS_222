@@ -103,16 +103,16 @@ int vmap_page_range(struct pcb_t *caller,           // process call
    *      [addr to addr + pgnum*PAGING_PAGESZ
    *      in page table caller->mm->pgd[]
    */
-  pthread_mutex_lock(&mem_lock);
+  // pthread_mutex_lock(&mem_lock);
   for (; pgit < pgnum; pgit++)
   {
-    caller->mm->pgd[pgn + pgit] = fpit;
+    // caller->mm->pgd[pgn + pgit] = fpit;
     ret_rg->rg_end += PAGING_PAGESZ; // Update the end address of the mapped region
     enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit);
-    pte_set_fpn(&caller->mm->pgd[pgn], fpit->fpn);
+    pte_set_fpn(&caller->mm->pgd[pgn+pgit], fpit->fpn);
     fpit = fpit->fp_next;
   }
-  pthread_mutex_unlock(&mem_lock);
+  // pthread_mutex_unlock(&mem_lock);
 
   /* Tracking for later page replacement activities (if needed)
    * Enqueue new usage page */
