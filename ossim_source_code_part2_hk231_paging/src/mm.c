@@ -138,15 +138,12 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
     {
       newfp_str = malloc(sizeof(struct framephy_struct));
       newfp_str->owner = caller->mm;
-      if(frm_lst == NULL)
-     {
+      if(frm_lst == NULL){
        newfp_str->fp_next = NULL;
        newfp_str->fpn = fpn;
        *frm_lst = newfp_str;
-     }
-      // case 2: frame list is not empty
-      else
-      {
+      }
+      else{
         newfp_str->fp_next = *frm_lst;
         newfp_str->fpn = fpn;
         *frm_lst = newfp_str;
