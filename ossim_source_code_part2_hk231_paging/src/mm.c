@@ -1,4 +1,4 @@
-// #ifdef MM_PAGING
+
 /*
  * PAGING based Memory Management
  * Memory management unit mm/mm.c
@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+
+#ifdef MM_PAGING
+
 /*
  * init_pte - Initialize PTE entry
  */
@@ -397,4 +400,4 @@ int print_pgtbl(struct pcb_t *caller, uint32_t start, uint32_t end)
   return 0;
 }
 
-// #endif
+#endif
