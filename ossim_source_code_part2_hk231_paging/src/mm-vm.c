@@ -130,20 +130,20 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
     caller->mm->symrgtbl[rgid].rg_end = rgnode.rg_end;
 
     *alloc_addr = rgnode.rg_start;
-  //     #ifdef EX
-  // printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
-  // printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, rgnode.rg_start, rgnode.rg_end);
-  //   print_rg_memphy(caller, rgnode);
-  // printf("\tUsed Region List: \n");
-  // for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
-  //     if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
-  //       continue;
-  //     }
-  //     printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
-  //   }
-  // printf("\tFree Region List:\n");
-  // print_list_rg(caller->mm->mmap->vm_freerg_list);
-  // #endif
+      #ifdef EX
+  printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
+  printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, rgnode.rg_start, rgnode.rg_end);
+    print_rg_memphy(caller, rgnode);
+  printf("\tUsed Region List: \n");
+  for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
+      if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
+        continue;
+      }
+      printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
+    }
+  printf("\tFree Region List:\n");
+  print_list_rg(caller->mm->mmap->vm_freerg_list);
+  #endif
     return 0;
   }
 
@@ -155,20 +155,20 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
     caller->mm->symrgtbl[rgid].rg_end = caller->mm->mmap->sbrk + size;
     caller->mm->mmap->sbrk += size;
     *alloc_addr = caller->mm->symrgtbl[rgid].rg_start;
-  //     #ifdef EX
-  // printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
-  // printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
-  //   print_rg_memphy(caller, caller->mm->symrgtbl[rgid]);
-  // printf("\tUsed Region List: \n");
-  // for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
-  //     if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
-  //       continue;
-  //     }
-  //     printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
-  //   }
-  // printf("\tFree Region List:\n");
-  // print_list_rg(caller->mm->mmap->vm_freerg_list);
-  // #endif
+      #ifdef EX
+  printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
+  printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
+    print_rg_memphy(caller, caller->mm->symrgtbl[rgid]);
+  printf("\tUsed Region List: \n");
+  for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
+      if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
+        continue;
+      }
+      printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
+    }
+  printf("\tFree Region List:\n");
+  print_list_rg(caller->mm->mmap->vm_freerg_list);
+  #endif
     return 0;
   }
 
@@ -195,20 +195,20 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   *alloc_addr = old_sbrk;
 
   cur_vma->sbrk += size;
-  //   #ifdef EX
-  // printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
-  // printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
-  // print_rg_memphy(caller, caller->mm->symrgtbl[rgid]);
-  // printf("\tUsed Region List: \n");
-  // for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
-  //     if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
-  //       continue;
-  //     }
-  //     printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
-  //   }
-  // printf("\tFree Region List:\n");
-  // print_list_rg(caller->mm->mmap->vm_freerg_list);
-  // #endif
+    #ifdef EX
+  printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
+  printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
+  print_rg_memphy(caller, caller->mm->symrgtbl[rgid]);
+  printf("\tUsed Region List: \n");
+  for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
+      if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
+        continue;
+      }
+      printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
+    }
+  printf("\tFree Region List:\n");
+  print_list_rg(caller->mm->mmap->vm_freerg_list);
+  #endif
   return 0;
 }
 
