@@ -66,7 +66,7 @@ int pte_set_swap(uint32_t *pte, int swptyp, int swpoff)
 }
 
 /*
- * pte_set_swap - Set PTE entry for on-line page
+ * pte_set_fpn - Set PTE entry for on-line page
  * @pte   : target page table entry (PTE)
  * @fpn   : frame page number (FPN)
  */
@@ -134,26 +134,31 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
 
   for (pgit = 0; pgit < req_pgnum; pgit++)
   {
-    if (MEMPHY_get_freefp(caller->mram, &fpn) == 0)
-    {
-      newfp_str = malloc(sizeof(struct framephy_struct));
-      newfp_str->owner = caller->mm;
-      if(frm_lst == NULL){
-       newfp_str->fp_next = NULL;
-       newfp_str->fpn = fpn;
-       *frm_lst = newfp_str;
-      }
-      else{
-        newfp_str->fp_next = *frm_lst;
-        newfp_str->fpn = fpn;
-        *frm_lst = newfp_str;
-      }
-      MEMPHY_put_fp(caller->mram, fpn);
-      
+    if (MEMPHY_get_freefp(caller->mram, &fpn) != 0){
+      // ERROR CODE of obtaining somes but not enough frames
+      int vicpgn;
+      int swpfpn;
+      // Find victim page for swapping
+      find_victim_page(caller->mm, &vicpgn);
+      fpn = PAGING_FPN(caller->mm->pgd[vicpgn]);
+      // Copy victim page
+      __swap_cp_page(caller->mram, fpn, caller->active_mswp, swpfpn);
+      // Update table (swapped pages)
+      pte_set_swap(caller->mm->pgd[vicpgn], 0, swpfpn);
     }
-    else
-    { // ERROR CODE of obtaining somes but not enough frames
+    //Enlist new node to frame list
+    newfp_str = malloc(sizeof(struct framephy_struct));
+    if (frm_lst == NULL){
+      newfp_str->fp_next = NULL;
+      newfp_str->fpn = fpn;
+      *frm_lst = newfp_str;
     }
+    else{
+      newfp_str->fp_next = *frm_lst;
+      newfp_str->fpn = fpn;
+      *frm_lst = newfp_str;
+    }
+    newfp_str->owner = caller->mm;
   }
 
   return 0;
