@@ -141,10 +141,12 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
       // Find victim page for swapping
       find_victim_page(caller->mm, &vicpgn);
       fpn = PAGING_FPN(caller->mm->pgd[vicpgn]);
+      //Get free frame in memswp
+      MEMPHY_get_freefp(caller->active_mswp, &swpfpn);
       // Copy victim page
       __swap_cp_page(caller->mram, fpn, caller->active_mswp, swpfpn);
       // Update table (swapped pages)
-      pte_set_swap(caller->mm->pgd[vicpgn], 0, swpfpn);
+      pte_set_swap(&caller->mm->pgd[vicpgn], 0, swpfpn);
     }
     //Enlist new node to frame list
     newfp_str = malloc(sizeof(struct framephy_struct));
