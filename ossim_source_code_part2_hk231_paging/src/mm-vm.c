@@ -121,61 +121,25 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   // cur_vma->sbrk += size;
   // return 0;
 
-  /*Allocate at the toproof */
+   /*Allocate at the toproof */
   struct vm_rg_struct rgnode;
 
-  // Check if there is free room in list vm_freerg_list of vma
-  if (get_free_vmrg_area(caller, vmaid, size, &rgnode) == 0) {
+  if (get_free_vmrg_area(caller, vmaid, size, &rgnode) == 0)
+  {
     caller->mm->symrgtbl[rgid].rg_start = rgnode.rg_start;
     caller->mm->symrgtbl[rgid].rg_end = rgnode.rg_end;
 
     *alloc_addr = rgnode.rg_start;
-      #ifdef EX
-  printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
-  printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, rgnode.rg_start, rgnode.rg_end);
-    print_rg_memphy(caller, rgnode);
-  printf("\tUsed Region List: \n");
-  for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
-      if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
-        continue;
-      }
-      printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
-    }
-  printf("\tFree Region List:\n");
-  print_list_rg(caller->mm->mmap->vm_freerg_list);
-  #endif
+
     return 0;
   }
-
+  
   /* TODO get_free_vmrg_area FAILED handle the region management (Fig.6)*/
 
   /*Attempt to increate limit to get space */
-  if( caller->mm->mmap->sbrk + size < caller->mm->mmap->vm_end){
-    caller->mm->symrgtbl[rgid].rg_start = caller->mm->mmap->sbrk;
-    caller->mm->symrgtbl[rgid].rg_end = caller->mm->mmap->sbrk + size;
-    caller->mm->mmap->sbrk += size;
-    *alloc_addr = caller->mm->symrgtbl[rgid].rg_start;
-      #ifdef EX
-  printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
-  printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
-    print_rg_memphy(caller, caller->mm->symrgtbl[rgid]);
-  printf("\tUsed Region List: \n");
-  for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
-      if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
-        continue;
-      }
-      printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
-    }
-  printf("\tFree Region List:\n");
-  print_list_rg(caller->mm->mmap->vm_freerg_list);
-  #endif
-    return 0;
-  }
-
-  
   struct vm_area_struct *cur_vma = get_vma_by_num(caller->mm, vmaid);
   int inc_sz = PAGING_PAGE_ALIGNSZ(size);
-  // int inc_limit_ret
+  //int inc_limit_ret
   int old_sbrk;
 
   old_sbrk = cur_vma->sbrk;
@@ -183,32 +147,16 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
   /* TODO INCREASE THE LIMIT
    * inc_vma_limit(caller, vmaid, inc_sz)
    */
-  if (inc_vma_limit(caller, vmaid, inc_sz) < 0) {
-    printf("Failed to increase virtual memory area limit!\n");
-    return -1;
-  }
+  if (inc_vma_limit(caller, vmaid, inc_sz) < 0) return -1;
 
   /*Successful increase limit */
-  caller->mm->symrgtbl[rgid].rg_start = old_sbrk;
-  caller->mm->symrgtbl[rgid].rg_end = old_sbrk + size;
-
+  if (get_free_vmrg_area(caller, vmaid, size, &rgnode) == 0){
+    caller->mm->symrgtbl[rgid].rg_start = old_sbrk;
+    //Increase size of the region area 
+    caller->mm->symrgtbl[rgid].rg_end = old_sbrk + size;
+  }
   *alloc_addr = old_sbrk;
-
   cur_vma->sbrk += size;
-    #ifdef EX
-  printf("\n\tRun ALLOC %d: Process %2d\n", size,  caller->pid);
-  printf("\tRange ID: %d, Start: %lu, End: %lu\n", rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
-  print_rg_memphy(caller, caller->mm->symrgtbl[rgid]);
-  printf("\tUsed Region List: \n");
-  for(int rgit = 0 ; rgit < PAGING_MAX_SYMTBL_SZ; rgit++){
-      if(caller->mm->symrgtbl[rgit].rg_start == 0 && caller->mm->symrgtbl[rgit].rg_end == 0){
-        continue;
-      }
-      printf("\trg[%ld->%ld]\n", caller->mm->symrgtbl[rgit].rg_start, caller->mm->symrgtbl[rgit].rg_end);
-    }
-  printf("\tFree Region List:\n");
-  print_list_rg(caller->mm->mmap->vm_freerg_list);
-  #endif
   return 0;
 }
 
