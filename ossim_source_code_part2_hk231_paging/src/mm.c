@@ -103,7 +103,7 @@ int vmap_page_range(struct pcb_t *caller,           // process call
   fpit->fp_next = frames;
 
   /* TODO map range of frame to address space
-   *      [addr to addr + pgnum*PAGING_PAGESZ
+   *      [addr to addr + pgnum*PAGING_PAGESZ 
    *      in page table caller->mm->pgd[]
    */
   // pthread_mutex_lock(&mem_lock);
@@ -148,7 +148,7 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
       MEMPHY_get_freefp(caller->active_mswp, &swpfpn);
       // Copy victim page
       __swap_cp_page(caller->mram, fpn, caller->active_mswp, swpfpn);
-      // Update table (swapped pages)
+      // Update table (swapped pages)w
       pte_set_swap(&caller->mm->pgd[vicpgn], 0, swpfpn);
     }
     //Enlist new node to frame list
