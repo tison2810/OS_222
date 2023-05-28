@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#ifdef MM_PAGING
+// #ifdef MM_PAGING
 
 /*
  * init_pte - Initialize PTE entry
@@ -165,7 +165,7 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
 
   for (pgit = 0; pgit < req_pgnum; pgit++)
   {
-    if (MEMPHY_get_freefp(caller->mram, &fpn) != 0){
+    if (MEMPHY_get_freefp(caller->mram, &fpn) < 0){
       // ERROR CODE of obtaining somes but not enough frames
       int vicpgn;
       int swpfpn;
@@ -180,18 +180,23 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
       pte_set_swap(&caller->mm->pgd[vicpgn], 0, swpfpn);
     }
     //Enlist new node to frame list
-    newfp_str = malloc(sizeof(struct framephy_struct));
-    if (frm_lst == NULL){
-      newfp_str->fp_next = NULL;
-      newfp_str->fpn = fpn;
-      *frm_lst = newfp_str;
-    }
-    else{
-      newfp_str->fp_next = *frm_lst;
-      newfp_str->fpn = fpn;
-      *frm_lst = newfp_str;
-    }
-    newfp_str->owner = caller->mm;
+    // newfp_str = malloc(sizeof(struct framephy_struct));
+    // if (frm_lst == NULL){
+    //   newfp_str->fp_next = NULL;
+    //   newfp_str->fpn = fpn;
+    //   *frm_lst = newfp_str;
+    // }
+    // else{
+    //   newfp_str->fp_next = *frm_lst;
+    //   newfp_str->fpn = fpn;
+    //   *frm_lst = newfp_str;
+    // }
+    // newfp_str->owner = caller->mm;
+        newfp_str = malloc(sizeof(struct framephy_struct));
+        newfp_str->fp_next = *frm_lst;
+        newfp_str->fpn = fpn;
+        newfp_str->owner = caller->mm;
+        *frm_lst = newfp_str;
   }
 
   return 0;
@@ -428,4 +433,4 @@ int print_pgtbl(struct pcb_t *caller, uint32_t start, uint32_t end)
   return 0;
 }
 
-#endif
+// #endif
