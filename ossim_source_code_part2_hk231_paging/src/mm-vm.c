@@ -180,7 +180,7 @@ int __free(struct pcb_t *caller, int vmaid, int rgid)
   // rgnode.rg_end = caller->mm->symrgtbl[rgid].rg_end;
 
   // get region which have ID is rgid (the one we need to free)
-  rgnode =  &(caller->mm->symrgtbl[rgid]);
+  rgnode = &(caller->mm->symrgtbl[rgid]);
 
   //note that this region can reuse for future allocation
   // caller->mm->symrgtbl[rgid].rg_start = 0;
@@ -264,6 +264,7 @@ int pg_getpage(struct mm_struct *mm, int pgn, int *fpn, struct pcb_t *caller)
   // *fpn = PAGING_FPN(pte);
 
   // return 0;
+
   // First, access into pgd of mm to get page table entry (pte)
   uint32_t pte = mm->pgd[pgn];
   // Secondly, If exist pte we need int pgd
@@ -538,6 +539,7 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, int inc_sz)
   if (vm_map_ram(caller, area->rg_start, area->rg_end, 
                     old_end, incnumpage , newrg) < 0)
     return -1; /* Map the memory to MEMRAM */
+  enlist_vm_rg_node(&cur_vma->vm_freerg_list, newrg);
 
   return 0;
 
