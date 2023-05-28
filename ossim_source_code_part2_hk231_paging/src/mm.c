@@ -92,63 +92,63 @@ int vmap_page_range(struct pcb_t *caller,           // process call
                     struct framephy_struct *frames, // list of the mapped frames
                     struct vm_rg_struct *ret_rg)    // return mapped region, the real mapped fp
 {                                                   // no guarantee all given pages are mapped
-  // // uint32_t * pte = malloc(sizeof(uint32_t));
-  // struct framephy_struct *fpit = malloc(sizeof(struct framephy_struct));
-  // // int  fpn;
-  // int pgit = 0;
-  // int pgn = PAGING_PGN(addr); // Extract page number
+  // uint32_t * pte = malloc(sizeof(uint32_t));
+  struct framephy_struct *fpit = malloc(sizeof(struct framephy_struct));
+  // int  fpn;
+  int pgit = 0;
+  int pgn = PAGING_PGN(addr); // Extract page number
 
-  // ret_rg->rg_end = ret_rg->rg_start = addr; // at least the very first space is usable
+  ret_rg->rg_end = ret_rg->rg_start = addr; // at least the very first space is usable
 
-  // fpit->fp_next = frames;
+  fpit->fp_next = frames;
 
-  // /* TODO map range of frame to address space
-  //  *      [addr to addr + pgnum*PAGING_PAGESZ 
-  //  *      in page table caller->mm->pgd[]
-  //  */
-  // // pthread_mutex_lock(&mem_lock);
-  // for (; pgit < pgnum; pgit++)
-  // {
-  //   // caller->mm->pgd[pgn + pgit] = fpit;
-  //   ret_rg->rg_end += PAGING_PAGESZ; // Update the end address of the mapped region
-  //   enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit);
-  //   pte_set_fpn(&caller->mm->pgd[pgn+pgit], fpit->fpn);
-  //   fpit = fpit->fp_next;
-  // }
-  // // pthread_mutex_unlock(&mem_lock);
+  /* TODO map range of frame to address space
+   *      [addr to addr + pgnum*PAGING_PAGESZ 
+   *      in page table caller->mm->pgd[]
+   */
+  // pthread_mutex_lock(&mem_lock);
+  for (; pgit < pgnum; pgit++)
+  {
+    // caller->mm->pgd[pgn + pgit] = fpit;
+    ret_rg->rg_end += PAGING_PAGESZ; // Update the end address of the mapped region
+    enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit);
+    pte_set_fpn(&caller->mm->pgd[pgn+pgit], fpit->fpn);
+    fpit = fpit->fp_next;
+  }
+  // pthread_mutex_unlock(&mem_lock);
 
-  // /* Tracking for later page replacement activities (if needed)
-  //  * Enqueue new usage page */
+  /* Tracking for later page replacement activities (if needed)
+   * Enqueue new usage page */
 
-  // return 0;
+  return 0;
 
-  struct framephy_struct* fpit;
-    // int  fpn;
-    int pgit = 0;
-    int pgn = PAGING_PGN(addr);
+  // struct framephy_struct* fpit;
+  //   // int  fpn;
+  //   int pgit = 0;
+  //   int pgn = PAGING_PGN(addr);
 
-    /* TODO map range of frame to address space
-     *      [addr to addr + pgnum*PAGING_PAGESZ
-     *      in page table caller->mm->pgd[]
-     */
+  //   /* TODO map range of frame to address space
+  //    *      [addr to addr + pgnum*PAGING_PAGESZ
+  //    *      in page table caller->mm->pgd[]
+  //    */
 
-     /*Update region*/
-    ret_rg->rg_start = addr;
-    ret_rg->rg_end = addr + pgnum * PAGING_PAGESZ;
-    ret_rg->rg_next = NULL;
+  //    /*Update region*/
+  //   ret_rg->rg_start = addr;
+  //   ret_rg->rg_end = addr + pgnum * PAGING_PAGESZ;
+  //   ret_rg->rg_next = NULL;
 
-    fpit = frames;
-    for (pgit = 0; pgit < pgnum; pgit++) {
-        pte_set_fpn(&caller->mm->pgd[pgn + pgit], fpit->fpn);
-        fpit = fpit->fp_next;
-        free(frames);
-        frames = fpit;
-        /* Tracking for later page replacement activities (if needed)
-        * Enqueue new usage page */
-        enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit); // put in the loop to track all the pages
-    }
+  //   fpit = frames;
+  //   for (pgit = 0; pgit < pgnum; pgit++) {
+  //       pte_set_fpn(&caller->mm->pgd[pgn + pgit], fpit->fpn);
+  //       fpit = fpit->fp_next;
+  //       free(frames);
+  //       frames = fpit;
+  //       /* Tracking for later page replacement activities (if needed)
+  //       * Enqueue new usage page */
+  //       enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit); // put in the loop to track all the pages
+  //   }
 
-    return 0;
+  //   return 0;
 }
 
 /*
@@ -180,23 +180,23 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
       pte_set_swap(&caller->mm->pgd[vicpgn], 0, swpfpn);
     }
     //Enlist new node to frame list
-    // newfp_str = malloc(sizeof(struct framephy_struct));
-    // if (frm_lst == NULL){
-    //   newfp_str->fp_next = NULL;
-    //   newfp_str->fpn = fpn;
-    //   *frm_lst = newfp_str;
-    // }
-    // else{
-    //   newfp_str->fp_next = *frm_lst;
-    //   newfp_str->fpn = fpn;
-    //   *frm_lst = newfp_str;
-    // }
-    // newfp_str->owner = caller->mm;
-        newfp_str = malloc(sizeof(struct framephy_struct));
-        newfp_str->fp_next = *frm_lst;
-        newfp_str->fpn = fpn;
-        newfp_str->owner = caller->mm;
-        *frm_lst = newfp_str;
+    newfp_str = malloc(sizeof(struct framephy_struct));
+    if (frm_lst == NULL){
+      newfp_str->fp_next = NULL;
+      newfp_str->fpn = fpn;
+      *frm_lst = newfp_str;
+    }
+    else{
+      newfp_str->fp_next = *frm_lst;
+      newfp_str->fpn = fpn;
+      *frm_lst = newfp_str;
+    }
+    newfp_str->owner = caller->mm;
+        // newfp_str = malloc(sizeof(struct framephy_struct));
+        // newfp_str->fp_next = *frm_lst;
+        // newfp_str->fpn = fpn;
+        // newfp_str->owner = caller->mm;
+        // *frm_lst = newfp_str;
   }
 
   return 0;
