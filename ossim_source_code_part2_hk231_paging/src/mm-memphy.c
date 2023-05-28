@@ -183,14 +183,15 @@ int MEMPHY_dump(struct memphy_struct * mp)
     /*TODO dump memphy contnt mp->storage 
      *     for tracing the memory content
      */
-   printf("Check memory physiscal dump\n");
-   printf("----------------------------------------\n");
+   printf("CHECK MEMORY PHYSICAL DUMP\n");
+   printf("_________________________________________\n");
    for (int i = 0; i < mp->maxsz; i++)
    {
       if (mp->storage[i] != 0)
-         printf("memphy[%d] = %d\n", i, mp->storage[i]);
+         printf("memphy content[%d] = %d\n", i, mp->storage[i]);
    }
-   printf("----------------------------------------\n");
+   printf("_________________________________________\n");
+   printf("END OF CHECK\n");
    return 0;
 }
 
