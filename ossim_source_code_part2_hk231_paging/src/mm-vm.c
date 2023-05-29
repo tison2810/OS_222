@@ -130,9 +130,9 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
     caller->mm->symrgtbl[rgid].rg_end = rgnode.rg_end;
 
     *alloc_addr = rgnode.rg_start;
-// #ifdef IODUMP
-//         printf("\t<Process %d> ALLOC region %d: %lu - %lu\n", caller->pid, rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
-// #endif
+#ifdef IODUMP
+        printf("\t<Process %d> ALLOC region %d: %lu - %lu\n", caller->pid, rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
+#endif
 
     return 0;
   }
@@ -161,9 +161,9 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
     cur_vma->sbrk += size;
     return 0;
   }
-// #ifdef IODUMP
-//     printf("\t<Process %d> ALLOC region %d: %lu - %lu\n", caller->pid, rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
-// #endif
+#ifdef IODUMP
+    printf("\t<Process %d> ALLOC region %d: %lu - %lu\n", caller->pid, rgid, caller->mm->symrgtbl[rgid].rg_start, caller->mm->symrgtbl[rgid].rg_end);
+#endif
   return 0;
 }
 
@@ -195,9 +195,9 @@ int __free(struct pcb_t *caller, int vmaid, int rgid)
   struct vm_area_struct* cur_vma = get_vma_by_num(caller->mm, vmaid);
   enlist_vm_rg_node(&cur_vma->vm_freerg_list, rgnode);
   // enlist_vm_freerg_list(caller->mm, rgnode);
-// #ifdef IODUMP
-//     printf("\t<Process %d> FREE region %d\n", caller->pid, rgid);
-// #endif
+#ifdef IODUMP
+    printf("\t<Process %d> FREE region %d\n", caller->pid, rgid);
+#endif
   return 0;
 }
 
