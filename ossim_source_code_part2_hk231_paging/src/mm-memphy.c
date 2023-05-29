@@ -192,7 +192,7 @@ int MEMPHY_dump(struct memphy_struct * mp)
    // }
    // printf("_________________________________________\n");
    // printf("END OF CHECK\n");
-   // return 0;
+   return 0;
 }
 
 int MEMPHY_put_freefp(struct memphy_struct *mp, int fpn)
